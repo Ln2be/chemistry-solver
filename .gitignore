@@ -1,7 +1,10 @@
-# Virtual environment
+# Virtual environments
 myenv/
-.env
+chem_env/
 venv/
+env/
+.venv/
+.env/
 
 # Python cache
 __pycache__/
@@ -26,3 +29,9 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/
