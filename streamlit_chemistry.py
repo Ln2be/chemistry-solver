@@ -29,7 +29,7 @@ st.markdown("""
     }
     
     /* Custom upload button */
-    .custom-upload-button > button {
+    .custom-upload-button {
         width: 100%;
         border-radius: 20px;
         padding: 2.5rem 1.5rem;
@@ -50,7 +50,7 @@ st.markdown("""
         gap: 0.5rem;
     }
     
-    .custom-upload-button > button:hover {
+    .custom-upload-button:hover {
         border-color: #0d47a1;
         background: #f8fbff;
         transform: translateY(-2px);
@@ -71,7 +71,7 @@ st.markdown("""
         transition: all 0.3s ease;
     }
     
-    .custom-upload-button > button:hover .upload-icon {
+    .custom-upload-button:hover .upload-icon {
         transform: scale(1.05);
         box-shadow: 0 12px 25px rgba(26, 115, 232, 0.4);
     }
@@ -97,7 +97,7 @@ st.markdown("""
     }
     
     /* Solve button styling */
-    .stButton > button:not(.custom-upload-button > button) {
+    .stButton > button {
         width: 100%;
         border-radius: 16px;
         height: 60px;
@@ -112,7 +112,7 @@ st.markdown("""
         transition: all 0.3s ease;
     }
     
-    .stButton > button:not(.custom-upload-button > button):hover {
+    .stButton > button:hover {
         background: linear-gradient(135deg, #2e8b47, #0d8040);
         transform: translateY(-2px);
         box-shadow: 0 12px 35px rgba(52, 168, 83, 0.4);
@@ -156,35 +156,28 @@ uploaded_file = st.file_uploader(
     key="file_uploader"
 )
 
-# Create a custom styled button to trigger the file uploader
-if st.button(
-    """
-    <div class='upload-icon'>📁</div>
-    <div class='upload-title'>رفع التمرين</div>
-    <div class='upload-subtitle'>انقر هنا لرفع صورة من هاتفك</div>
-    <div class='upload-hint'>الصور المدعومة: PNG, JPG, JPEG</div>
-    """,
-    key="custom_upload_button",
-    use_container_width=True,
-    type="primary",
-    args=("custom-upload-button",)
-):
-    st.markdown("""
-    <script>
-    function triggerFileUpload() {
-        let fileInput = document.querySelector('input[type="file"]') ||
-                        document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
-        if (fileInput) {
-            console.log('File input found:', fileInput);
-            fileInput.click();
-        } else {
-            console.error('File input not found!');
-            alert('تعذر العثور على عنصر رفع الملف. تأكد من تحميل الصفحة بشكل كامل.');
-        }
+# Create a custom styled button using markdown
+st.markdown("""
+<button class="custom-upload-button" onclick="triggerFileUpload()">
+    <div class="upload-icon">📁</div>
+    <div class="upload-title">رفع التمرين</div>
+    <div class="upload-subtitle">انقر هنا لرفع صورة من هاتفك</div>
+    <div class="upload-hint">الصور المدعومة: PNG, JPG, JPEG</div>
+</button>
+<script>
+function triggerFileUpload() {
+    let fileInput = document.querySelector('input[type="file"]') ||
+                    document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
+    if (fileInput) {
+        console.log('File input found:', fileInput);
+        fileInput.click();
+    } else {
+        console.error('File input not found!');
+        alert('تعذر العثور على عنصر رفع الملف. تأكد من تحميل الصفحة بشكل كامل.');
     }
-    triggerFileUpload();
-    </script>
-    """, unsafe_allow_html=True)
+}
+</script>
+""", unsafe_allow_html=True)
 
 # Show selected file info
 if uploaded_file is not None:
