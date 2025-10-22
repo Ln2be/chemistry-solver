@@ -163,9 +163,18 @@ st.markdown("""
 </div>
 <script>
 function triggerFileUpload() {
-    const fileInput = document.querySelector('input[type="file"]');
+    // Try multiple selectors to find the file input
+    let fileInput = document.querySelector('input[type="file"]');
+    if (!fileInput) {
+        // Fallback: Search within Streamlit's widget structure
+        fileInput = document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
+    }
     if (fileInput) {
+        console.log('File input found:', fileInput);
         fileInput.click();
+    } else {
+        console.error('File input not found!');
+        alert('تعذر العثور على عنصر رفع الملف. تأكد من تحميل الصفحة بشكل كامل.');
     }
 }
 </script>
