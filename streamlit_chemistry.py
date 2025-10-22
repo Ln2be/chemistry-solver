@@ -18,14 +18,9 @@ st.markdown("""
         padding-bottom: 2rem;
     }
     
-    /* Hide the default file uploader but keep it functional */
-    .uploader-hidden {
-        position: absolute !important;
-        left: -9999px !important;
-        opacity: 0 !important;
-        width: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
+    /* Hide the file uploader column completely */
+    .hidden-uploader {
+        display: none !important;
     }
     
     /* Custom upload container */
@@ -39,7 +34,6 @@ st.markdown("""
         border: 2px dashed #1a73e8;
         transition: all 0.3s ease;
         cursor: pointer;
-        position: relative;
     }
     
     .custom-upload-container:hover {
@@ -144,63 +138,75 @@ if 'api_configured' not in st.session_state:
 # Configure Gemini
 st.session_state.api_configured = configure_gemini()
 
-# Create columns to position the hidden uploader
-col1, col2 = st.columns([1, 1])
+# Create hidden columns for the file uploader
+col1, col2 = st.columns([0.01, 0.99])
 
 with col1:
-    # Create the file uploader but hide it with custom CSS class
+    # Hidden file uploader - this column will be hidden with CSS
     uploaded_file = st.file_uploader(
-        "رفع صورة التمرين",
+        " ",
         type=['png', 'jpg', 'jpeg'],
         label_visibility="collapsed",
         key="hidden_uploader"
     )
 
-# Add custom CSS class to hide the uploader
+# Add CSS to hide the first column
+st.markdown("""
+<style>
+    /* Hide the first column containing the file uploader */
+    .stHorizontalBlock > div:first-child {
+        display: none !important;
+    }
+    
+    /* Ensure the second column takes full width */
+    .stHorizontalBlock > div:last-child {
+        width: 100% !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+with col2:
+    # Custom beautiful upload section
+    st.markdown("""
+    <div class="custom-upload-container" id="customUpload">
+        <div class="upload-icon">📁</div>
+        <div class="upload-title">رفع التمرين</div>
+        <div class="upload-subtitle">انقر هنا لاختيار صورة من هاتفك</div>
+        <div class="upload-hint">PNG, JPG, JPEG - حتى 200MB</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# JavaScript to connect the custom square to the hidden file uploader
 st.markdown("""
 <script>
-// Add hidden class to the file uploader
-function hideUploader() {
-    const uploader = document.querySelector('[data-testid="stFileUploader"]');
-    if (uploader) {
-        uploader.classList.add('uploader-hidden');
-    }
-}
-
-// Make custom container clickable
-function setupCustomUpload() {
-    const customUpload = document.querySelector('.custom-upload-container');
+// Function to connect the custom uploader to the hidden file input
+function connectUploader() {
+    const customUpload = document.getElementById('customUpload');
+    // Find the file input in the hidden column
     const fileInput = document.querySelector('input[type="file"]');
     
     if (customUpload && fileInput) {
         customUpload.addEventListener('click', function() {
             fileInput.click();
         });
+        
+        // Also add some visual feedback when file is selected
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                customUpload.style.borderColor = '#34a853';
+                customUpload.style.background = '#f0f8f0';
+            }
+        });
     }
 }
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    hideUploader();
-    setupCustomUpload();
-});
+// Initialize when the page loads
+document.addEventListener('DOMContentLoaded', connectUploader);
 
-// Also try after a delay in case of async loading
-setTimeout(function() {
-    hideUploader();
-    setupCustomUpload();
-}, 1000);
+// Also try after a short delay in case elements load asynchronously
+setTimeout(connectUploader, 100);
+setTimeout(connectUploader, 500);
 </script>
-""", unsafe_allow_html=True)
-
-# Custom beautiful upload section that triggers the hidden file uploader
-st.markdown("""
-<div class="custom-upload-container">
-    <div class="upload-icon">📁</div>
-    <div class="upload-title">رفع التمرين</div>
-    <div class="upload-subtitle">انقر هنا لاختيار صورة من هاتفك</div>
-    <div class="upload-hint">PNG, JPG, JPEG - حتى 200MB</div>
-</div>
 """, unsafe_allow_html=True)
 
 # Show selected file info
@@ -211,6 +217,7 @@ if uploaded_file is not None:
             <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
             <div style="color: #1a73e8; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">تم رفع الملف بنجاح!</div>
             <div style="color: #5f6368; font-size: 0.95rem;">{uploaded_file.name}</div>
+            <div style="color: #9aa0a6; font-size: 0.8rem; margin-top: 0.5rem;">حجم الملف: {uploaded_file.size / 1024 / 1024:.1f} MB</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
