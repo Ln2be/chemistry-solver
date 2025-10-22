@@ -51,7 +51,7 @@ def get_success_html():
         text-align: center;
         font-weight: 600;
     '>
-        ✅ تم إنشاء الحل بنجاح
+        ✅ تم إنشاء الحل 
     </div>
     """
 
