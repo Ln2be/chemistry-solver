@@ -4,97 +4,19 @@ from config import configure_gemini, get_gemini_model
 from templates import get_header_html, get_footer_html, get_success_html, get_error_html
 from prompts import CHEMISTRY_PROMPT
 
-# Load the font
+# First load the font
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
-# Custom CSS for modern mobile design
+# Simple CSS for basic styling
 st.markdown("""
 <style>
-    /* Main container styling */
     .main .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
     }
     
-    /* Completely hide the file uploader */
-    .stFileUploader {
-        display: none !important;
-    }
-    
-    /* Hide file uploader label */
-    .stFileUploader > label {
-        display: none !important;
-    }
-    
-    /* Hide the custom file input */
-    .custom-file-input {
-        display: none !important;
-    }
-    
-    /* Custom upload container */
-    .custom-upload-container {
-        background: white;
-        border-radius: 20px;
-        padding: 2.5rem 1.5rem;
-        margin: 1.5rem 0;
-        text-align: center;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        border: 2px dashed #1a73e8;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        font-family: "Cairo", sans-serif;
-    }
-    
-    .custom-upload-container:hover {
-        border-color: #0d47a1;
-        background: #f8fbff;
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px rgba(26, 115, 232, 0.15);
-    }
-    
-    .upload-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #1a73e8, #0d47a1);
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        font-size: 2.5rem;
-        color: white;
-        box-shadow: 0 8px 20px rgba(26, 115, 232, 0.3);
-        transition: all 0.3s ease;
-    }
-    
-    .custom-upload-container:hover .upload-icon {
-        transform: scale(1.05);
-        box-shadow: 0 12px 25px rgba(26, 115, 232, 0.4);
-    }
-    
-    .upload-title {
-        color: #1a73e8;
-        margin: 0 0 0.5rem;
-        font-size: 1.4rem;
-        font-weight: 700;
-    }
-    
-    .upload-subtitle {
-        color: #5f6368;
-        margin: 0;
-        font-size: 1rem;
-        line-height: 1.5;
-    }
-    
-    .upload-hint {
-        color: #9aa0a6;
-        margin: 1rem 0 0;
-        font-size: 0.85rem;
-    }
-    
-    /* Solve button styling */
     .stButton > button {
         width: 100%;
         border-radius: 16px;
@@ -107,23 +29,6 @@ st.markdown("""
         color: white;
         margin: 1rem 0;
         box-shadow: 0 8px 25px rgba(52, 168, 83, 0.3);
-        transition: all 0.3s ease;
-    }
-    
-    .stButton > button:hover {
-        background: linear-gradient(135deg, #2e8b47, #0d8040);
-        transform: translateY(-2px);
-        box-shadow: 0 12px 35px rgba(52, 168, 83, 0.4);
-    }
-    
-    /* File info card */
-    .file-info-card {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        border-left: 4px solid #34a853;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -142,69 +47,85 @@ st.markdown(get_header_html(), unsafe_allow_html=True)
 # Initialize session state
 if 'api_configured' not in st.session_state:
     st.session_state.api_configured = False
-if 'uploaded_file' not in st.session_state:
-    st.session_state.uploaded_file = None
 
 # Configure Gemini
 st.session_state.api_configured = configure_gemini()
 
-# Create a fallback Streamlit file uploader (hidden)
-uploaded_file = st.file_uploader(
-    "رفع صورة التمرين",
-    type=['png', 'jpg', 'jpeg'],
-    label_visibility="collapsed",
-    key="file_uploader"
-)
-
-# Create a custom upload container and hidden file input
+# SIMPLE WORKING FILE UPLOADER
 st.markdown("""
-<div class="custom-upload-container" onclick="triggerFileUpload()">
-    <div class="upload-icon">📁</div>
-    <div class="upload-title">رفع التمرين</div>
-    <div class="upload-subtitle">انقر هنا لرفع صورة من هاتفك</div>
-    <div class="upload-hint">الصور المدعومة: PNG, JPG, JPEG</div>
+<div style='
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem 1.5rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: 2px dashed #1a73e8;
+'>
+    <div style='
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #1a73e8, #0d47a1);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+        color: white;
+        box-shadow: 0 8px 20px rgba(26, 115, 232, 0.3);
+    '>
+        📁
+    </div>
+    <div style='
+        font-family: "Cairo", sans-serif;
+        color: #1a73e8;
+        margin: 0 0 0.5rem;
+        font-size: 1.4rem;
+        font-weight: 700;
+    '>رفع التمرين</div>
+    <div style='
+        font-family: "Cairo", sans-serif;
+        color: #5f6368;
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.5;
+    '>استخدم الزر أدناه لرفع صورة من هاتفك</div>
 </div>
-<input type="file" id="customFileInput" class="custom-file-input" accept=".png,.jpg,.jpeg">
-<script>
-function triggerFileUpload() {
-    setTimeout(() => {
-        let fileInput = document.getElementById('customFileInput') ||
-                        document.querySelector('input[type="file"]') ||
-                        document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
-        if (fileInput) {
-            console.log('File input found:', fileInput);
-            fileInput.click();
-        } else {
-            console.error('File input not found! DOM structure:', document.body.innerHTML);
-            alert('تعذر العثور على عنصر رفع الملف. تأكد من تحميل الصفحة بشكل كامل.');
-        }
-    }, 500); // Wait 500ms for DOM to load
-}
-</script>
 """, unsafe_allow_html=True)
 
-# Fallback to Streamlit file uploader for file handling
-if uploaded_file is not None:
-    st.session_state.uploaded_file = uploaded_file
+# NATIVE STREAMLIT FILE UPLOADER - GUARANTEED TO WORK
+uploaded_file = st.file_uploader(
+    "اختر صورة التمرين",
+    type=['png', 'jpg', 'jpeg'],
+    help="PNG, JPG, JPEG - حتى 200MB"
+)
 
 # Show selected file info
-if st.session_state.uploaded_file is not None:
+if uploaded_file is not None:
     st.markdown(f"""
-    <div class="file-info-card">
-        <div style="font-family: 'Cairo', sans-serif; text-align: center;">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
-            <div style="color: #1a73e8; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">تم رفع الملف بنجاح!</div>
-            <div style="color: #5f6368; font-size: 0.95rem;">{st.session_state.uploaded_file.name}</div>
-            <div style="color: #9aa0a6; font-size: 0.8rem; margin-top: 0.5rem;">حجم الملف: {st.session_state.uploaded_file.size / 1024 / 1024:.1f} MB</div>
-        </div>
+    <div style='
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-left: 4px solid #34a853;
+        font-family: "Cairo", sans-serif;
+        text-align: center;
+    '>
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+        <div style="color: #1a73e8; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">تم رفع الملف بنجاح!</div>
+        <div style="color: #5f6368; font-size: 0.95rem;">{uploaded_file.name}</div>
+        <div style="color: #9aa0a6; font-size: 0.8rem; margin-top: 0.5rem;">حجم الملف: {uploaded_file.size / 1024 / 1024:.1f} MB</div>
     </div>
     """, unsafe_allow_html=True)
     
     # Display the uploaded image
-    image = Image.open(st.session_state.uploaded_file)
+    image = Image.open(uploaded_file)
     st.image(image, use_container_width=True)
     
-    # Solve button - mobile style
+    # Solve button
     if st.button("🚀 حل التمرين الآن", type="primary", use_container_width=True):
         if not st.session_state.api_configured:
             st.markdown(get_error_html("حدث خطأ في الإعدادات"), unsafe_allow_html=True)

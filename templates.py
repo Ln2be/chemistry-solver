@@ -44,13 +44,12 @@ def get_success_html():
         background: #e6f4ea;
         color: #137333;
         padding: 1rem;
-        border-radius: 16px;
+        border-radius: 12px;
         margin: 1rem 0;
         border: 1px solid #34a853;
         font-family: "Cairo", sans-serif;
         text-align: center;
-        font-weight: 700;
-        font-size: 1.1rem;
+        font-weight: 600;
     '>
         ✅ تم إنشاء الحل بنجاح
     </div>
@@ -63,13 +62,12 @@ def get_error_html(message):
         background: #fce8e6;
         color: #c5221f;
         padding: 1rem;
-        border-radius: 16px;
+        border-radius: 12px;
         margin: 1rem 0;
         border: 1px solid #ea4335;
         font-family: "Cairo", sans-serif;
         text-align: center;
-        font-weight: 700;
-        font-size: 1.1rem;
+        font-weight: 600;
     '>
         ❌ {message}
     </div>
