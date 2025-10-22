@@ -28,29 +28,26 @@ st.markdown("""
         display: none !important;
     }
     
-    /* Custom upload button (using div) */
-    .custom-upload-button {
-        width: 100%;
+    /* Hide the custom file input */
+    .custom-file-input {
+        display: none !important;
+    }
+    
+    /* Custom upload container */
+    .custom-upload-container {
+        background: white;
         border-radius: 20px;
         padding: 2.5rem 1.5rem;
+        margin: 1.5rem 0;
         text-align: center;
         box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         border: 2px dashed #1a73e8;
-        background: white;
         transition: all 0.3s ease;
         cursor: pointer;
         font-family: "Cairo", sans-serif;
-        color: #1a73e8;
-        font-size: 1.4rem;
-        font-weight: 700;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
     }
     
-    .custom-upload-button:hover {
+    .custom-upload-container:hover {
         border-color: #0d47a1;
         background: #f8fbff;
         transform: translateY(-2px);
@@ -65,20 +62,21 @@ st.markdown("""
         display: flex;
         align-items: center;
         justify-content: center;
+        margin: 0 auto 1.5rem;
         font-size: 2.5rem;
         color: white;
         box-shadow: 0 8px 20px rgba(26, 115, 232, 0.3);
         transition: all 0.3s ease;
     }
     
-    .custom-upload-button:hover .upload-icon {
+    .custom-upload-container:hover .upload-icon {
         transform: scale(1.05);
         box-shadow: 0 12px 25px rgba(26, 115, 232, 0.4);
     }
     
     .upload-title {
         color: #1a73e8;
-        margin: 0;
+        margin: 0 0 0.5rem;
         font-size: 1.4rem;
         font-weight: 700;
     }
@@ -92,7 +90,7 @@ st.markdown("""
     
     .upload-hint {
         color: #9aa0a6;
-        margin: 0.5rem 0 0;
+        margin: 1rem 0 0;
         font-size: 0.85rem;
     }
     
@@ -144,11 +142,13 @@ st.markdown(get_header_html(), unsafe_allow_html=True)
 # Initialize session state
 if 'api_configured' not in st.session_state:
     st.session_state.api_configured = False
+if 'uploaded_file' not in st.session_state:
+    st.session_state.uploaded_file = None
 
 # Configure Gemini
 st.session_state.api_configured = configure_gemini()
 
-# Create the file uploader first (it will be hidden by CSS)
+# Create a fallback Streamlit file uploader (hidden)
 uploaded_file = st.file_uploader(
     "رفع صورة التمرين",
     type=['png', 'jpg', 'jpeg'],
@@ -156,19 +156,20 @@ uploaded_file = st.file_uploader(
     key="file_uploader"
 )
 
-# Create a custom styled clickable div to trigger the file uploader
+# Create a custom upload container and hidden file input
 st.markdown("""
-<div class="custom-upload-button" onclick="triggerFileUpload()">
+<div class="custom-upload-container" onclick="triggerFileUpload()">
     <div class="upload-icon">📁</div>
     <div class="upload-title">رفع التمرين</div>
     <div class="upload-subtitle">انقر هنا لرفع صورة من هاتفك</div>
     <div class="upload-hint">الصور المدعومة: PNG, JPG, JPEG</div>
 </div>
+<input type="file" id="customFileInput" class="custom-file-input" accept=".png,.jpg,.jpeg">
 <script>
 function triggerFileUpload() {
-    // Wait for DOM to ensure file input is available
     setTimeout(() => {
-        let fileInput = document.querySelector('input[type="file"]') ||
+        let fileInput = document.getElementById('customFileInput') ||
+                        document.querySelector('input[type="file"]') ||
                         document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
         if (fileInput) {
             console.log('File input found:', fileInput);
@@ -182,21 +183,25 @@ function triggerFileUpload() {
 </script>
 """, unsafe_allow_html=True)
 
-# Show selected file info
+# Fallback to Streamlit file uploader for file handling
 if uploaded_file is not None:
+    st.session_state.uploaded_file = uploaded_file
+
+# Show selected file info
+if st.session_state.uploaded_file is not None:
     st.markdown(f"""
     <div class="file-info-card">
         <div style="font-family: 'Cairo', sans-serif; text-align: center;">
             <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
             <div style="color: #1a73e8; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">تم رفع الملف بنجاح!</div>
-            <div style="color: #5f6368; font-size: 0.95rem;">{uploaded_file.name}</div>
-            <div style="color: #9aa0a6; font-size: 0.8rem; margin-top: 0.5rem;">حجم الملف: {uploaded_file.size / 1024 / 1024:.1f} MB</div>
+            <div style="color: #5f6368; font-size: 0.95rem;">{st.session_state.uploaded_file.name}</div>
+            <div style="color: #9aa0a6; font-size: 0.8rem; margin-top: 0.5rem;">حجم الملف: {st.session_state.uploaded_file.size / 1024 / 1024:.1f} MB</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
     # Display the uploaded image
-    image = Image.open(uploaded_file)
+    image = Image.open(st.session_state.uploaded_file)
     st.image(image, use_container_width=True)
     
     # Solve button - mobile style
