@@ -1,24 +1,51 @@
 import streamlit as st
 from PIL import Image
 from config import configure_gemini, get_gemini_model
-from templates import get_header_html, get_footer_html, get_success_html, get_error_html
+from templates import get_header_html, get_footer_html, get_success_html, get_error_html, get_upload_section_html
 from prompts import CHEMISTRY_PROMPT
 
-
-# Add this at the top of your streamlit_chemistry.py file after imports
+# Mobile app styling
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+    .main {
+        padding: 0 1rem;
+    }
+    .stFileUploader > div > div {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+    }
+    .stFileUploader > label {
+        display: none !important;
+    }
+    .stButton > button {
+        width: 100%;
+        border-radius: 12px;
+        height: 50px;
+        font-family: "Cairo", sans-serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: none;
+        background: #1a73e8;
+    }
+    .stButton > button:hover {
+        background: #1669c1;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-
-# Set page config - MUST BE FIRST
+# Set page config for mobile
 st.set_page_config(
-    page_title="Chemistry Problem Solver",
+    page_title="اشرحلي",
     page_icon="🧪",
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
-# App title and description using HTML template
+# Header
 st.markdown(get_header_html(), unsafe_allow_html=True)
 
 # Initialize session state
@@ -28,40 +55,61 @@ if 'api_configured' not in st.session_state:
 # Configure Gemini
 st.session_state.api_configured = configure_gemini()
 
-# File uploader
+# Mobile-style upload section
+st.markdown(get_upload_section_html(), unsafe_allow_html=True)
+
+# Hidden file uploader that uses the beautiful section as trigger
 uploaded_file = st.file_uploader(
-    "📤 Upload Image",
+    "رفع صورة التمرين",
     type=['png', 'jpg', 'jpeg'],
-    help="Upload a clear image of your exercise"
+    label_visibility="collapsed"
 )
 
 if uploaded_file is not None:
-    # Display the uploaded image
+    # Display the uploaded image in a card
     image = Image.open(uploaded_file)
-    st.image(image, caption="Your Chemistry Problem", use_container_width=True)
+    st.markdown("""
+    <div style='
+        background: white;
+        border-radius: 16px;
+        padding: 1rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    '>
+    </div>
+    """, unsafe_allow_html=True)
+    st.image(image, use_container_width=True)
     
-    # Analyze button
-    if st.button("🚀 حل التمرين", type="primary"):
+    # Solve button - mobile style
+    if st.button("🚀 حل التمرين الآن", type="primary"):
         if not st.session_state.api_configured:
-            st.markdown(get_error_html("API not configured. Please check your settings."), unsafe_allow_html=True)
+            st.markdown(get_error_html("حدث خطأ في الإعدادات"), unsafe_allow_html=True)
         else:
-            with st.spinner("🔬 نقوم بتحليل التمرين هذا ... هذا قد يستغرق من 10 الى 20 ثانية"):
+            with st.spinner("🔬 جاري تحليل التمرين..."):
                 try:
-                    # Use Gemini model from config
                     model = get_gemini_model()
-                    
-                    # Use the imported prompt
                     response = model.generate_content([CHEMISTRY_PROMPT, image])
                     
-                    # Display solution
                     st.markdown(get_success_html(), unsafe_allow_html=True)
                     st.markdown("---")
-                    st.markdown(response.text)
+                    
+                    # Solution in a nice card
+                    st.markdown(f"""
+                    <div style='
+                        background: white;
+                        border-radius: 16px;
+                        padding: 1.5rem;
+                        margin: 1rem 0;
+                        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+                        font-family: "Cairo", sans-serif;
+                    '>
+                        {response.text}
+                    </div>
+                    """, unsafe_allow_html=True)
                     
                 except Exception as e:
-                    st.markdown(get_error_html(f"Error analyzing image: {str(e)}"), unsafe_allow_html=True)
-                    st.info("💡 Tips: Make sure the image is clear and contains readable text.")
+                    st.markdown(get_error_html(f"خطأ في التحليل: {str(e)}"), unsafe_allow_html=True)
+                    st.info("📱 تأكد من جودة الصورة ووضوح النص")
 
-# Footer using HTML template
-st.markdown("---")
+# Footer
 st.markdown(get_footer_html(), unsafe_allow_html=True)
