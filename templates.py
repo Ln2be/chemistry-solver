@@ -112,3 +112,43 @@ def get_error_html(message):
         ❌ {message}
     </div>
     """
+
+    def get_upload_section_html():
+    """Return mobile-friendly upload section"""
+    return """
+    <div style='
+        background: white;
+        border-radius: 16px;
+        padding: 2rem 1rem;
+        margin: 1rem 0;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        border: 1px solid #e8eaed;
+    '>
+        <div style='
+            width: 80px;
+            height: 80px;
+            background: #1a73e8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        '>
+            📁
+        </div>
+        <h3 style='
+            font-family: "Cairo", sans-serif;
+            color: #202124;
+            margin: 0 0 0.5rem;
+            font-size: 1.2rem;
+        '>رفع التمرين</h3>
+        <p style='
+            font-family: "Cairo", sans-serif;
+            color: #5f6368;
+            margin: 0;
+            font-size: 0.9rem;
+        '>انقر لاختيار صورة من هاتفك</p>
+    </div>
+    """
