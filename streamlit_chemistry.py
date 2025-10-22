@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 from config import configure_gemini, get_gemini_model
-from templates import get_header_html, get_footer_html, get_success_html, get_error_html, get_upload_section_html
+from templates import get_header_html, get_footer_html, get_success_html, get_error_html
 from prompts import CHEMISTRY_PROMPT
 
 # Mobile app styling
@@ -55,61 +55,40 @@ if 'api_configured' not in st.session_state:
 # Configure Gemini
 st.session_state.api_configured = configure_gemini()
 
-# Mobile-style upload section
-st.markdown(get_upload_section_html(), unsafe_allow_html=True)
-
-# Hidden file uploader that uses the beautiful section as trigger
+# Simple file uploader for now
 uploaded_file = st.file_uploader(
-    "رفع صورة التمرين",
+    "📤 رفع صورة التمرين",
     type=['png', 'jpg', 'jpeg'],
-    label_visibility="collapsed"
+    help="📸 انقر لاختيار صورة من هاتفك"
 )
 
 if uploaded_file is not None:
-    # Display the uploaded image in a card
+    # Display the uploaded image
     image = Image.open(uploaded_file)
-    st.markdown("""
-    <div style='
-        background: white;
-        border-radius: 16px;
-        padding: 1rem;
-        margin: 1rem 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    '>
-    </div>
-    """, unsafe_allow_html=True)
-    st.image(image, use_container_width=True)
+    st.image(image, caption="📸 الصورة المرفوعة", use_container_width=True)
     
-    # Solve button - mobile style
-    if st.button("🚀 حل التمرين الآن", type="primary"):
+    # Solve button
+    if st.button("🚀 حل التمرين", type="primary"):
         if not st.session_state.api_configured:
-            st.markdown(get_error_html("حدث خطأ في الإعدادات"), unsafe_allow_html=True)
+            st.markdown(get_error_html("API not configured. Please check your settings."), unsafe_allow_html=True)
         else:
-            with st.spinner("🔬 جاري تحليل التمرين..."):
+            with st.spinner("🔬 نقوم بتحليل التمرين... قد يستغرق هذا من 10 الى 20 ثانية"):
                 try:
+                    # Use Gemini model from config
                     model = get_gemini_model()
+                    
+                    # Use the imported prompt
                     response = model.generate_content([CHEMISTRY_PROMPT, image])
                     
+                    # Display solution
                     st.markdown(get_success_html(), unsafe_allow_html=True)
                     st.markdown("---")
-                    
-                    # Solution in a nice card
-                    st.markdown(f"""
-                    <div style='
-                        background: white;
-                        border-radius: 16px;
-                        padding: 1.5rem;
-                        margin: 1rem 0;
-                        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-                        font-family: "Cairo", sans-serif;
-                    '>
-                        {response.text}
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(response.text)
                     
                 except Exception as e:
-                    st.markdown(get_error_html(f"خطأ في التحليل: {str(e)}"), unsafe_allow_html=True)
-                    st.info("📱 تأكد من جودة الصورة ووضوح النص")
+                    st.markdown(get_error_html(f"Error analyzing image: {str(e)}"), unsafe_allow_html=True)
+                    st.info("💡 نصائح: تأكد من أن الصورة واضحة وتحتوي على نص مقروء")
 
-# Footer
+# Footer using HTML template
+st.markdown("---")
 st.markdown(get_footer_html(), unsafe_allow_html=True)
