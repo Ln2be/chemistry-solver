@@ -28,7 +28,7 @@ st.markdown("""
         display: none !important;
     }
     
-    /* Custom upload button */
+    /* Custom upload button (using div) */
     .custom-upload-button {
         width: 100%;
         border-radius: 20px;
@@ -156,25 +156,28 @@ uploaded_file = st.file_uploader(
     key="file_uploader"
 )
 
-# Create a custom styled button using markdown
+# Create a custom styled clickable div to trigger the file uploader
 st.markdown("""
-<button class="custom-upload-button" onclick="triggerFileUpload()">
+<div class="custom-upload-button" onclick="triggerFileUpload()">
     <div class="upload-icon">📁</div>
     <div class="upload-title">رفع التمرين</div>
     <div class="upload-subtitle">انقر هنا لرفع صورة من هاتفك</div>
     <div class="upload-hint">الصور المدعومة: PNG, JPG, JPEG</div>
-</button>
+</div>
 <script>
 function triggerFileUpload() {
-    let fileInput = document.querySelector('input[type="file"]') ||
-                    document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
-    if (fileInput) {
-        console.log('File input found:', fileInput);
-        fileInput.click();
-    } else {
-        console.error('File input not found!');
-        alert('تعذر العثور على عنصر رفع الملف. تأكد من تحميل الصفحة بشكل كامل.');
-    }
+    // Wait for DOM to ensure file input is available
+    setTimeout(() => {
+        let fileInput = document.querySelector('input[type="file"]') ||
+                        document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
+        if (fileInput) {
+            console.log('File input found:', fileInput);
+            fileInput.click();
+        } else {
+            console.error('File input not found! DOM structure:', document.body.innerHTML);
+            alert('تعذر العثور على عنصر رفع الملف. تأكد من تحميل الصفحة بشكل كامل.');
+        }
+    }, 500); // Wait 500ms for DOM to load
 }
 </script>
 """, unsafe_allow_html=True)
