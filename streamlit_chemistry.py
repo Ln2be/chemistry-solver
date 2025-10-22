@@ -28,20 +28,29 @@ st.markdown("""
         display: none !important;
     }
     
-    /* Custom upload container */
-    .custom-upload-container {
-        background: white;
+    /* Custom upload button */
+    .custom-upload-button > button {
+        width: 100%;
         border-radius: 20px;
         padding: 2.5rem 1.5rem;
-        margin: 1.5rem 0;
         text-align: center;
         box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         border: 2px dashed #1a73e8;
+        background: white;
         transition: all 0.3s ease;
         cursor: pointer;
+        font-family: "Cairo", sans-serif;
+        color: #1a73e8;
+        font-size: 1.4rem;
+        font-weight: 700;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
     
-    .custom-upload-container:hover {
+    .custom-upload-button > button:hover {
         border-color: #0d47a1;
         background: #f8fbff;
         transform: translateY(-2px);
@@ -56,28 +65,25 @@ st.markdown("""
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1.5rem;
         font-size: 2.5rem;
         color: white;
         box-shadow: 0 8px 20px rgba(26, 115, 232, 0.3);
         transition: all 0.3s ease;
     }
     
-    .custom-upload-container:hover .upload-icon {
+    .custom-upload-button > button:hover .upload-icon {
         transform: scale(1.05);
         box-shadow: 0 12px 25px rgba(26, 115, 232, 0.4);
     }
     
     .upload-title {
-        font-family: "Cairo", sans-serif;
         color: #1a73e8;
-        margin: 0 0 0.5rem;
+        margin: 0;
         font-size: 1.4rem;
         font-weight: 700;
     }
     
     .upload-subtitle {
-        font-family: "Cairo", sans-serif;
         color: #5f6368;
         margin: 0;
         font-size: 1rem;
@@ -85,14 +91,13 @@ st.markdown("""
     }
     
     .upload-hint {
-        font-family: "Cairo", sans-serif;
         color: #9aa0a6;
-        margin: 1rem 0 0;
+        margin: 0.5rem 0 0;
         font-size: 0.85rem;
     }
     
     /* Solve button styling */
-    .stButton > button {
+    .stButton > button:not(.custom-upload-button > button) {
         width: 100%;
         border-radius: 16px;
         height: 60px;
@@ -107,7 +112,7 @@ st.markdown("""
         transition: all 0.3s ease;
     }
     
-    .stButton > button:hover {
+    .stButton > button:not(.custom-upload-button > button):hover {
         background: linear-gradient(135deg, #2e8b47, #0d8040);
         transform: translateY(-2px);
         box-shadow: 0 12px 35px rgba(52, 168, 83, 0.4);
@@ -151,34 +156,35 @@ uploaded_file = st.file_uploader(
     key="file_uploader"
 )
 
-# Create a custom upload trigger using a clickable div
-st.markdown("""
-<div class="custom-upload-container" onclick="triggerFileUpload()">
-    <div class="upload-icon">
-        📁
-    </div>
-    <div class="upload-title">رفع التمرين</div>
-    <div class="upload-subtitle">انقر هنا لرفع صورة من هاتفك</div>
-    <div class="upload-hint">الصور المدعومة: PNG, JPG, JPEG</div>
-</div>
-<script>
-function triggerFileUpload() {
-    // Try multiple selectors to find the file input
-    let fileInput = document.querySelector('input[type="file"]');
-    if (!fileInput) {
-        // Fallback: Search within Streamlit's widget structure
-        fileInput = document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
+# Create a custom styled button to trigger the file uploader
+if st.button(
+    """
+    <div class='upload-icon'>📁</div>
+    <div class='upload-title'>رفع التمرين</div>
+    <div class='upload-subtitle'>انقر هنا لرفع صورة من هاتفك</div>
+    <div class='upload-hint'>الصور المدعومة: PNG, JPG, JPEG</div>
+    """,
+    key="custom_upload_button",
+    use_container_width=True,
+    type="primary",
+    args=("custom-upload-button",)
+):
+    st.markdown("""
+    <script>
+    function triggerFileUpload() {
+        let fileInput = document.querySelector('input[type="file"]') ||
+                        document.querySelector('div[data-testid="stFileUploader"] input[type="file"]');
+        if (fileInput) {
+            console.log('File input found:', fileInput);
+            fileInput.click();
+        } else {
+            console.error('File input not found!');
+            alert('تعذر العثور على عنصر رفع الملف. تأكد من تحميل الصفحة بشكل كامل.');
+        }
     }
-    if (fileInput) {
-        console.log('File input found:', fileInput);
-        fileInput.click();
-    } else {
-        console.error('File input not found!');
-        alert('تعذر العثور على عنصر رفع الملف. تأكد من تحميل الصفحة بشكل كامل.');
-    }
-}
-</script>
-""", unsafe_allow_html=True)
+    triggerFileUpload();
+    </script>
+    """, unsafe_allow_html=True)
 
 # Show selected file info
 if uploaded_file is not None:
