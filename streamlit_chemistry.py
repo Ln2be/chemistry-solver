@@ -38,7 +38,7 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     # Display the uploaded image
     image = Image.open(uploaded_file)
-    st.image(image, caption="Your Chemistry Problem", use_column_width=True)
+    st.image(image, caption="Your Chemistry Problem", use_container_width=True)
     
     # Analyze button
     if st.button("🚀 حل التمرين", type="primary"):
