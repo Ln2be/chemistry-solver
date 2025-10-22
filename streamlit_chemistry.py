@@ -18,14 +18,14 @@ st.markdown("""
         padding-bottom: 2rem;
     }
     
-    /* Completely hide the default file uploader */
-    div[data-testid="stFileUploader"] {
-        display: none !important;
-    }
-    
-    /* Hide any file input that might be visible */
-    input[type="file"] {
-        display: none !important;
+    /* Hide the default file uploader but keep it functional */
+    .uploader-hidden {
+        position: absolute !important;
+        left: -9999px !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
     }
     
     /* Custom upload container */
@@ -39,6 +39,7 @@ st.markdown("""
         border: 2px dashed #1a73e8;
         transition: all 0.3s ease;
         cursor: pointer;
+        position: relative;
     }
     
     .custom-upload-container:hover {
@@ -143,64 +144,63 @@ if 'api_configured' not in st.session_state:
 # Configure Gemini
 st.session_state.api_configured = configure_gemini()
 
-# Create the file uploader first (but keep it hidden)
-uploaded_file = st.file_uploader(
-    "رفع صورة التمرين",
-    type=['png', 'jpg', 'jpeg'],
-    label_visibility="collapsed",
-    key="hidden_uploader"
-)
+# Create columns to position the hidden uploader
+col1, col2 = st.columns([1, 1])
 
-# Custom beautiful upload section that triggers the hidden file uploader
-st.markdown("""
-<div class="custom-upload-container" id="customUpload">
-    <div class="upload-icon">📁</div>
-    <div class="upload-title">رفع التمرين</div>
-    <div class="upload-subtitle">انقر هنا لاختيار صورة من هاتفك</div>
-    <div class="upload-hint">PNG, JPG, JPEG - حتى 200MB</div>
-</div>
-""", unsafe_allow_html=True)
+with col1:
+    # Create the file uploader but hide it with custom CSS class
+    uploaded_file = st.file_uploader(
+        "رفع صورة التمرين",
+        type=['png', 'jpg', 'jpeg'],
+        label_visibility="collapsed",
+        key="hidden_uploader"
+    )
 
-# JavaScript to make the custom container trigger the file upload
+# Add custom CSS class to hide the uploader
 st.markdown("""
 <script>
-function setupFileUpload() {
-    const customUpload = document.getElementById('customUpload');
+// Add hidden class to the file uploader
+function hideUploader() {
+    const uploader = document.querySelector('[data-testid="stFileUploader"]');
+    if (uploader) {
+        uploader.classList.add('uploader-hidden');
+    }
+}
+
+// Make custom container clickable
+function setupCustomUpload() {
+    const customUpload = document.querySelector('.custom-upload-container');
     const fileInput = document.querySelector('input[type="file"]');
     
     if (customUpload && fileInput) {
         customUpload.addEventListener('click', function() {
             fileInput.click();
         });
-        
-        // Also make sure the file input is completely hidden
-        fileInput.style.display = 'none';
-        fileInput.style.visibility = 'hidden';
-        fileInput.style.position = 'absolute';
-        fileInput.style.left = '-9999px';
     }
 }
 
-// Try multiple times to ensure the file input is found
-let attempts = 0;
-const maxAttempts = 10;
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    hideUploader();
+    setupCustomUpload();
+});
 
-function initializeUploader() {
-    attempts++;
-    const fileInput = document.querySelector('input[type="file"]');
-    
-    if (fileInput) {
-        setupFileUpload();
-    } else if (attempts < maxAttempts) {
-        setTimeout(initializeUploader, 500);
-    }
-}
-
-// Start the initialization
-document.addEventListener('DOMContentLoaded', initializeUploader);
-// Also try when the page loads
-window.addEventListener('load', initializeUploader);
+// Also try after a delay in case of async loading
+setTimeout(function() {
+    hideUploader();
+    setupCustomUpload();
+}, 1000);
 </script>
+""", unsafe_allow_html=True)
+
+# Custom beautiful upload section that triggers the hidden file uploader
+st.markdown("""
+<div class="custom-upload-container">
+    <div class="upload-icon">📁</div>
+    <div class="upload-title">رفع التمرين</div>
+    <div class="upload-subtitle">انقر هنا لاختيار صورة من هاتفك</div>
+    <div class="upload-hint">PNG, JPG, JPEG - حتى 200MB</div>
+</div>
 """, unsafe_allow_html=True)
 
 # Show selected file info
