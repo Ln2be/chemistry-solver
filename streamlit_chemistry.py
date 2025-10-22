@@ -4,6 +4,38 @@ from config import configure_gemini, get_gemini_model
 from templates import get_header_html, get_footer_html, get_success_html, get_error_html
 from prompts import CHEMISTRY_PROMPT
 
+
+
+# Clean, reliable solution card
+def display_solution(response_text, subject="Physics"):
+    icon = "⚛️" if subject == "Physics" else "🧪"
+    
+    with st.container():
+        st.markdown(f"""
+        <div style="
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+        ">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+                <span style="font-size: 1.2rem;">{icon}</span>
+                <h3 style="margin: 0; color: #2d3748;">{subject} Solution</h3>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Content in a clean container
+        st.markdown(response_text)
+        
+        st.markdown("""
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #718096; font-size: 0.9rem;">
+                Educational Solution • Powered by Gemini AI
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+
 # First load the font
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -138,24 +170,44 @@ if uploaded_file is not None:
                     st.markdown(get_success_html(), unsafe_allow_html=True)
                     st.markdown("---")
                     
-                    # Solution in a nice card
-                    st.markdown(f"""
-                    <div style='
-                        background: white;
-                        border-radius: 20px;
-                        padding: 2rem;
-                        margin: 1rem 0;
-                        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-                        font-family: "Cairo", sans-serif;
-                        line-height: 1.7;
-                    '>
-                        {response.text}
-                    </div>
-                    """, unsafe_allow_html=True)
+               # Minimal and clean version
+
                     
+                    # Usage
+                    display_solution(response.text, "Physics")
                 except Exception as e:
                     st.markdown(get_error_html(f"خطأ في التحليل: {str(e)}"), unsafe_allow_html=True)
                     st.info("📱 تأكد من جودة الصورة ووضوح النص")
 
 # Footer
 st.markdown(get_footer_html(), unsafe_allow_html=True)
+
+# Clean, reliable solution card
+def display_solution(response_text, subject="Physics"):
+    icon = "⚛️" if subject == "Physics" else "🧪"
+    
+    with st.container():
+        st.markdown(f"""
+        <div style="
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+        ">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+                <span style="font-size: 1.2rem;">{icon}</span>
+                <h3 style="margin: 0; color: #2d3748;">{subject} Solution</h3>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Content in a clean container
+        st.markdown(response_text)
+        
+        st.markdown("""
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #718096; font-size: 0.9rem;">
+                Educational Solution • Powered by Gemini AI
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
