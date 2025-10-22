@@ -4,6 +4,13 @@ from config import configure_gemini, get_gemini_model
 from templates import get_header_html, get_footer_html, get_success_html, get_error_html
 from prompts import CHEMISTRY_PROMPT
 
+
+# Add this at the top of your streamlit_chemistry.py file after imports
+st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+""", unsafe_allow_html=True)
+
+
 # Set page config - MUST BE FIRST
 st.set_page_config(
     page_title="Chemistry Problem Solver",
