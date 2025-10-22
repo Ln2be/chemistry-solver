@@ -4,7 +4,7 @@ from config import configure_gemini, get_gemini_model
 from templates import get_header_html, get_footer_html, get_success_html, get_error_html
 from prompts import CHEMISTRY_PROMPT
 
-# First load the font
+# Load the font
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
@@ -151,61 +151,25 @@ uploaded_file = st.file_uploader(
     key="file_uploader"
 )
 
-# Create a custom upload trigger using a button with custom styling
+# Create a custom upload trigger using a clickable div
 st.markdown("""
-<div style='
-    background: white;
-    border-radius: 20px;
-    padding: 2.5rem 1.5rem;
-    margin: 1.5rem 0;
-    text-align: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    border: 2px dashed #1a73e8;
-'>
-    <div style='
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #1a73e8, #0d47a1);
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        font-size: 2.5rem;
-        color: white;
-        box-shadow: 0 8px 20px rgba(26, 115, 232, 0.3);
-    '>
+<div class="custom-upload-container" onclick="triggerFileUpload()">
+    <div class="upload-icon">
         📁
     </div>
-    <div style='
-        font-family: "Cairo", sans-serif;
-        color: #1a73e8;
-        margin: 0 0 0.5rem;
-        font-size: 1.4rem;
-        font-weight: 700;
-    '>رفع التمرين</div>
-    <div style='
-        font-family: "Cairo", sans-serif;
-        color: #5f6368;
-        margin: 0;
-        font-size: 1rem;
-        line-height: 1.5;
-    '>انقر على الزر أدناه لرفع صورة من هاتفك</div>
+    <div class="upload-title">رفع التمرين</div>
+    <div class="upload-subtitle">انقر هنا لرفع صورة من هاتفك</div>
+    <div class="upload-hint">الصور المدعومة: PNG, JPG, JPEG</div>
 </div>
-""", unsafe_allow_html=True)
-
-# Use Streamlit's native button to trigger file selection
-if st.button("📁 اختر صورة التمرين", key="upload_trigger", use_container_width=True):
-    # This will focus on the hidden file uploader
-    st.markdown("""
-    <script>
-    // Focus on the file input when the button is clicked
+<script>
+function triggerFileUpload() {
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput) {
         fileInput.click();
     }
-    </script>
-    """, unsafe_allow_html=True)
+}
+</script>
+""", unsafe_allow_html=True)
 
 # Show selected file info
 if uploaded_file is not None:
