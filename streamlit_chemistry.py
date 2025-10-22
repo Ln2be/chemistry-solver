@@ -18,12 +18,17 @@ st.markdown("""
         padding-bottom: 2rem;
     }
     
-    /* Hide the default file uploader completely */
-    .stFileUploader > div {
+    /* Completely hide the default file uploader */
+    div[data-testid="stFileUploader"] {
         display: none !important;
     }
     
-    /* Custom upload button styling */
+    /* Hide any file input that might be visible */
+    input[type="file"] {
+        display: none !important;
+    }
+    
+    /* Custom upload container */
     .custom-upload-container {
         background: white;
         border-radius: 20px;
@@ -47,7 +52,7 @@ st.markdown("""
         width: 80px;
         height: 80px;
         background: linear-gradient(135deg, #1a73e8, #0d47a1);
-        border-radius: 50%;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -55,6 +60,12 @@ st.markdown("""
         font-size: 2.5rem;
         color: white;
         box-shadow: 0 8px 20px rgba(26, 115, 232, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .custom-upload-container:hover .upload-icon {
+        transform: scale(1.05);
+        box-shadow: 0 12px 25px rgba(26, 115, 232, 0.4);
     }
     
     .upload-title {
@@ -132,9 +143,17 @@ if 'api_configured' not in st.session_state:
 # Configure Gemini
 st.session_state.api_configured = configure_gemini()
 
-# Custom beautiful upload section
+# Create the file uploader first (but keep it hidden)
+uploaded_file = st.file_uploader(
+    "رفع صورة التمرين",
+    type=['png', 'jpg', 'jpeg'],
+    label_visibility="collapsed",
+    key="hidden_uploader"
+)
+
+# Custom beautiful upload section that triggers the hidden file uploader
 st.markdown("""
-<div class="custom-upload-container" onclick="document.getElementById('file-uploader').click()">
+<div class="custom-upload-container" id="customUpload">
     <div class="upload-icon">📁</div>
     <div class="upload-title">رفع التمرين</div>
     <div class="upload-subtitle">انقر هنا لاختيار صورة من هاتفك</div>
@@ -142,28 +161,45 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Hidden file uploader
-uploaded_file = st.file_uploader(
-    "رفع صورة التمرين",
-    type=['png', 'jpg', 'jpeg'],
-    label_visibility="collapsed",
-    key="file-uploader"
-)
-
-# JavaScript to make the custom container clickable
+# JavaScript to make the custom container trigger the file upload
 st.markdown("""
 <script>
-    // Make the custom upload container clickable
-    document.addEventListener('DOMContentLoaded', function() {
-        const customUpload = document.querySelector('.custom-upload-container');
-        const fileInput = document.querySelector('input[type="file"]');
+function setupFileUpload() {
+    const customUpload = document.getElementById('customUpload');
+    const fileInput = document.querySelector('input[type="file"]');
+    
+    if (customUpload && fileInput) {
+        customUpload.addEventListener('click', function() {
+            fileInput.click();
+        });
         
-        if (customUpload && fileInput) {
-            customUpload.addEventListener('click', function() {
-                fileInput.click();
-            });
-        }
-    });
+        // Also make sure the file input is completely hidden
+        fileInput.style.display = 'none';
+        fileInput.style.visibility = 'hidden';
+        fileInput.style.position = 'absolute';
+        fileInput.style.left = '-9999px';
+    }
+}
+
+// Try multiple times to ensure the file input is found
+let attempts = 0;
+const maxAttempts = 10;
+
+function initializeUploader() {
+    attempts++;
+    const fileInput = document.querySelector('input[type="file"]');
+    
+    if (fileInput) {
+        setupFileUpload();
+    } else if (attempts < maxAttempts) {
+        setTimeout(initializeUploader, 500);
+    }
+}
+
+// Start the initialization
+document.addEventListener('DOMContentLoaded', initializeUploader);
+// Also try when the page loads
+window.addEventListener('load', initializeUploader);
 </script>
 """, unsafe_allow_html=True)
 
