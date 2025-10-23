@@ -3,9 +3,7 @@ from PIL import Image
 from config import configure_gemini, get_gemini_model
 from templates import get_header_html, get_footer_html, get_success_html, get_error_html
 from prompts import CHEMISTRY_PROMPT
-
-
-import streamlit as st
+import re
 
 # Add Cairo font for Arabic text
 st.markdown("""
@@ -45,8 +43,37 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Simple LaTeX renderer that doesn't break anything
+def render_with_latex(text):
+    """
+    Minimal LaTeX support - only processes \ce{} chemical formulas
+    """
+    lines = text.split('\n')
+    
+    for line in lines:
+        if not line.strip():
+            st.write("")
+            continue
+            
+        # Only process lines with chemical formulas
+        if '\\ce{' in line:
+            # Simple split to handle chemical formulas
+            parts = re.split(r'(\\ce\{[^}]+\})', line)
+            
+            for part in parts:
+                if part.startswith('\\ce{') and part.endswith('}'):
+                    chem_content = part[4:-1]
+                    try:
+                        st.latex(f"\\ce{{{chem_content}}}")
+                    except:
+                        st.markdown(f"**{chem_content}**")
+                else:
+                    st.markdown(part, unsafe_allow_html=True)
+        else:
+            # Regular text - no changes
+            st.markdown(line, unsafe_allow_html=True)
 
-# Clean, reliable solution card
+# Clean, reliable solution card with minimal LaTeX support
 def display_solution(response_text, subject="Physics"):
     icon = "⚛️" if subject == "Physics" else "🧪"
     
@@ -65,8 +92,8 @@ def display_solution(response_text, subject="Physics"):
             </div>
         """, unsafe_allow_html=True)
         
-        # Content in a clean container
-        st.markdown(response_text)
+        # Content with minimal LaTeX support
+        render_with_latex(response_text)
         
         st.markdown("""
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #718096; font-size: 0.9rem;">
@@ -74,7 +101,6 @@ def display_solution(response_text, subject="Physics"):
             </div>
         </div>
         """, unsafe_allow_html=True)
-
 
 # First load the font
 st.markdown("""
@@ -210,9 +236,6 @@ if uploaded_file is not None:
                     st.markdown(get_success_html(), unsafe_allow_html=True)
                     st.markdown("---")
                     
-               # Minimal and clean version
-
-                    
                     # Usage
                     display_solution(response.text, "Physics")
                 except Exception as e:
@@ -221,33 +244,3 @@ if uploaded_file is not None:
 
 # Footer
 st.markdown(get_footer_html(), unsafe_allow_html=True)
-
-# Clean, reliable solution card
-def display_solution(response_text, subject="Physics"):
-    icon = "⚛️" if subject == "Physics" else "🧪"
-    
-    with st.container():
-        st.markdown(f"""
-        <div style="
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-left: 4px solid #667eea;
-        ">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
-                <span style="font-size: 1.2rem;">{icon}</span>
-                <h3 style="margin: 0; color: #2d3748;">{subject} Solution</h3>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Content in a clean container
-        st.markdown(response_text)
-        
-        st.markdown("""
-            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; color: #718096; font-size: 0.9rem;">
-                Educational Solution • Powered by Gemini AI
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
