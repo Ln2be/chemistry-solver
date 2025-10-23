@@ -5,6 +5,46 @@ from templates import get_header_html, get_footer_html, get_success_html, get_er
 from prompts import CHEMISTRY_PROMPT
 
 
+import streamlit as st
+
+# Add Cairo font for Arabic text
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap');
+
+/* Apply Cairo font to all Arabic text and general text */
+* {
+    font-family: 'Cairo', 'Arial', sans-serif;
+}
+
+/* Specific styling for Arabic content */
+.arabic-text {
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 500;
+    direction: rtl;
+    text-align: right;
+}
+
+/* Ensure error messages use Cairo */
+.error-message {
+    font-family: 'Cairo', sans-serif !important;
+    direction: rtl;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* For the solution card Arabic parts */
+.arabic-message {
+    font-family: 'Cairo', sans-serif !important;
+    direction: rtl;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 10px 0;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 # Clean, reliable solution card
 def display_solution(response_text, subject="Physics"):
