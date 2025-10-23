@@ -40,40 +40,33 @@ st.markdown("""
     font-weight: 600;
     margin: 10px 0;
 }
+
+/* Style for chemical formulas */
+.chemical-formula {
+    font-family: 'Courier New', monospace;
+    background: #f0f8ff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #d1e7ff;
+    display: inline-block;
+    margin: 2px 0;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# Simple LaTeX renderer that doesn't break anything
+# Simple function that works on both local and hosted Streamlit
 def render_with_latex(text):
     """
-    Minimal LaTeX support - only processes \ce{} chemical formulas
+    Safe rendering that works on hosted Streamlit
+    Uses simple markdown for chemical formulas
     """
-    lines = text.split('\n')
+    # Replace \ce{} with formatted text instead of LaTeX
+    processed_text = re.sub(r'\\ce\{([^}]+)\}', r'<span class="chemical-formula">\1</span>', text)
     
-    for line in lines:
-        if not line.strip():
-            st.write("")
-            continue
-            
-        # Only process lines with chemical formulas
-        if '\\ce{' in line:
-            # Simple split to handle chemical formulas
-            parts = re.split(r'(\\ce\{[^}]+\})', line)
-            
-            for part in parts:
-                if part.startswith('\\ce{') and part.endswith('}'):
-                    chem_content = part[4:-1]
-                    try:
-                        st.latex(f"\\ce{{{chem_content}}}")
-                    except:
-                        st.markdown(f"**{chem_content}**")
-                else:
-                    st.markdown(part, unsafe_allow_html=True)
-        else:
-            # Regular text - no changes
-            st.markdown(line, unsafe_allow_html=True)
+    # Display the processed text
+    st.markdown(processed_text, unsafe_allow_html=True)
 
-# Clean, reliable solution card with minimal LaTeX support
+# Clean, reliable solution card
 def display_solution(response_text, subject="Physics"):
     icon = "⚛️" if subject == "Physics" else "🧪"
     
@@ -92,7 +85,7 @@ def display_solution(response_text, subject="Physics"):
             </div>
         """, unsafe_allow_html=True)
         
-        # Content with minimal LaTeX support
+        # Content in a clean container
         render_with_latex(response_text)
         
         st.markdown("""
