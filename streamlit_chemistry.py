@@ -5,6 +5,27 @@ from templates import get_header_html, get_footer_html, get_success_html, get_er
 from prompts import CHEMISTRY_PROMPT
 import re
 
+
+# Google Analytics - Add your tracking ID here
+GA_TRACKING_ID = "G-3FQMVNFJL6"  # Replace with your actual Google Analytics ID
+
+# Google Analytics HTML injection
+google_analytics_html = f"""
+<script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+  gtag('config', '{GA_TRACKING_ID}');
+</script>
+"""
+
+# Inject Google Analytics
+st.components.v1.html(google_analytics_html, height=0)
+
+# Rest of your existing code continues here...
+
+
 # Add Cairo font for Arabic text
 st.markdown("""
 <style>
