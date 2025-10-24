@@ -2,7 +2,6 @@ import streamlit as st
 from PIL import Image
 from config import configure_gemini, get_gemini_model
 from templates import get_header_html, get_footer_html, get_success_html, get_error_html
-from prompts import CHEMISTRY_PROMPT
 import re
 
 # Set page config for mobile
@@ -238,6 +237,9 @@ if uploaded_file is not None:
         else:
             with st.spinner("🔬 جاري تحليل التمرين..."):
                 try:
+                    # Import prompts HERE to avoid circular imports
+                    from prompts import CHEMISTRY_PROMPT
+                    
                     model = get_gemini_model()
                     response = model.generate_content([CHEMISTRY_PROMPT, image])
                     
