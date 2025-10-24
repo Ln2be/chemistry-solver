@@ -4,7 +4,8 @@ from config import configure_gemini, get_gemini_model
 from templates import get_header_html, get_footer_html, get_success_html, get_error_html
 from prompts import CHEMISTRY_PROMPT
 import re
-
+from streamlit_google_analytics import google_analytics
+google_analytics(measurement_id="G-3FQMVNFJL6")
 
 
 # Google Analytics using Streamlit's built-in components
