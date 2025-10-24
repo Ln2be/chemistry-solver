@@ -7,14 +7,10 @@ import re
 
 
 
-
 # Google Analytics using Streamlit's built-in components
 def inject_google_analytics():
     """Inject Google Analytics using Streamlit's safe method"""
-  
-    # Google Analytics - Add your tracking ID here
-    GA_TRACKING_ID = "G-3FQMVNFJL6"  # Replace with your actual Google Analytics ID
-    # Method that works on Streamlit Cloud
+    GA_TRACKING_ID = "G-3FQMVNFJL6"  # Your actual Google Analytics ID
     ga_script = f"""
     <script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
     <script>
@@ -27,17 +23,12 @@ def inject_google_analytics():
         }});
     </script>
     """
-    
-    # Use Streamlit's components to safely inject the script
     st.components.v1.html(ga_script, height=0)
 
 # Initialize analytics only once per session
 if 'ga_injected' not in st.session_state:
     st.session_state.ga_injected = True
     inject_google_analytics()
-
-# Inject Google Analytics
-st.components.v1.html(google_analytics_html, height=0)
 
 # Rest of your existing code continues here...
 
