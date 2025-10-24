@@ -4,35 +4,29 @@ from config import configure_gemini, get_gemini_model
 from templates import get_header_html, get_footer_html, get_success_html, get_error_html
 from prompts import CHEMISTRY_PROMPT
 import re
-from streamlit_google_analytics import google_analytics
-google_analytics(measurement_id="G-3FQMVNFJL6")
 
+# Set page config for mobile
+st.set_page_config(
+    page_title="اشرحلي",
+    page_icon="🧪",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-# Google Analytics using Streamlit's built-in components
-def inject_google_analytics():
-    """Inject Google Analytics using Streamlit's safe method"""
-    GA_TRACKING_ID = "G-3FQMVNFJL6"  # Your actual Google Analytics ID
-    ga_script = f"""
-    <script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){{dataLayer.push(arguments);}}
-        gtag('js', new Date());
-        gtag('config', '{GA_TRACKING_ID}', {{
-            'page_title': 'Chemistry Physics Solver',
-            'page_location': window.location.href
-        }});
-    </script>
+# Google Analytics - Add this simple code
+st.components.v1.html(
     """
-    st.components.v1.html(ga_script, height=0)
-
-# Initialize analytics only once per session
-if 'ga_injected' not in st.session_state:
-    st.session_state.ga_injected = True
-    inject_google_analytics()
-
-# Rest of your existing code continues here...
-
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3FQMVNFJL6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-3FQMVNFJL6');
+    </script>
+    """,
+    height=0
+)
 
 # Add Cairo font for Arabic text
 st.markdown("""
@@ -152,14 +146,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-# Set page config for mobile
-st.set_page_config(
-    page_title="اشرحلي",
-    page_icon="🧪",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
 
 # Header
 st.markdown(get_header_html(), unsafe_allow_html=True)
